@@ -9,6 +9,8 @@ const Login = () => {
       axios.post("http://localhost:3000/login",{
       emailId,
       password,
+    },{
+      withCredentials:true,
     })
     } catch (error) {
       console.log(error);

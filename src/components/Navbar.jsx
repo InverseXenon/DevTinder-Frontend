@@ -27,35 +27,35 @@ const Navbar = () => {
         <Link to = "/" className="btn btn-ghost text-xl">🧑‍💻DevTinder</Link>
       </div>
       <div className="flex gap-2">
-  {user && <p className="my-1 font-semibold">Welcome {user.firstName} !</p>}
+        {user && <p className="my-1 font-semibold">Welcome {user.firstName} !</p>}
 
-  {user && (
-    <div className="dropdown dropdown-end mx-5">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-        <div className="w-10 rounded-full">
-          <img
-            alt="User avatar"
-            src={user.photoUrl}
-          />
-        </div>
+        {user && (
+          <div className="dropdown dropdown-end mx-5">
+            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+              <div className="w-10 rounded-full">
+                <img
+                  alt="User avatar"
+                  src={user.photoUrl}
+                />
+              </div>
+            </div>
+
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <Link to="/profile" className="justify-between">
+                  Profile
+                  <span className="badge">New</span>
+                </Link>
+              </li>
+              <li><a>Settings</a></li>
+              <li><a onClick={handleLogout}>Logout</a></li>
+            </ul>
+          </div>
+        )}
       </div>
-
-      <ul
-        tabIndex={0}
-        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
-      >
-        <li>
-          <Link to="/profile" className="justify-between">
-            Profile
-            <span className="badge">New</span>
-          </Link>
-        </li>
-        <li><a>Settings</a></li>
-        <li><a onClick={handleLogout}>Logout</a></li>
-      </ul>
-    </div>
-  )}
-</div>
 
     </div>
   )

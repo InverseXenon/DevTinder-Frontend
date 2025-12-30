@@ -63,7 +63,7 @@ const Login = () => {
               id="password"
               type="password"
               value={password}
-              placeholder="Enter your email"
+              placeholder="Enter your password"
               className="input input-bordered w-full my-2 p-2"
               onChange={(e)=>{
                 setPassword(e.target.value);

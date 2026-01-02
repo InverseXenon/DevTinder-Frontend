@@ -53,8 +53,8 @@ const Connections = () => {
                 src={photoUrl}
                 alt={firstName} />
             </figure>
-            <div className="card-body">
-                <h2 className="card-title text-center">
+            <div className="card-body ">
+                <h2 className="card-title flex justify-center font-bold text-xl text-center">
                 {firstName}  {lastName}
                 </h2>
                 <p>{about}</p>

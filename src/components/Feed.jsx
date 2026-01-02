@@ -24,7 +24,8 @@ const Feed = () => {
 
   useEffect(()=>{
       getFeed();
-  },[])
+  },[]);
+  
   
   return feed && (
     <div className="flex justify-center mb-10 mt-5"><UserCard user = {feed[0]} /></div>

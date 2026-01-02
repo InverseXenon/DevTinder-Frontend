@@ -1,11 +1,11 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addRequests } from "../utils/requestSlice";
+import { addRequests, removeRequest } from "../utils/requestSlice";
 
 const Requests = () => {
-    const requests = useSelector((store)=> store.requests)
+    const requests = useSelector((store)=> store.requests);
     const dispatch = useDispatch();
     const fetchRequests = async () => {
         try {
@@ -17,7 +17,17 @@ const Requests = () => {
         } catch (error) {
             console.log(error);
         }
-    }
+    };
+    const reviewRequest = async (status,_id)=>{
+        try {
+            await axios.post(BASE_URL+"/request/review/"+status+"/"+ _id,{},{
+                withCredentials:true,
+            });
+            dispatch(removeRequest(_id));
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     useEffect(()=>{
         fetchRequests();
@@ -43,11 +53,11 @@ const Requests = () => {
     <div className=' text-center my-10'>
         <h1 className='font-bold text-2xl'>Requests</h1>
         <div className='flex flex-wrap'>
-        {requests.map((request,index)=>{
-            const {firstName, lastName, photoUrl, age, gender, about } = request.fromUserId;
+        {requests.map((request)=>{
+            const {_id,firstName, lastName, photoUrl, age, gender, about } = request.fromUserId;
         return(
 
-            <div key={index} className="card bg-base-100 w-52 m-7 shadow-sm">
+            <div key={_id} className="card bg-base-100 w-52 m-7 shadow-sm">
             <figure>
                 <img
                 src={photoUrl}
@@ -60,8 +70,8 @@ const Requests = () => {
                 <p>{about}</p>
             </div>
             <div>
-                <button className="btn bg-red-500 mx-4 p-2 rounded-xl">Reject</button>   
-                <button className="btn bg-green-600 mx-4 p-2 rounded-xl">Accept</button>                 
+                <button className="btn bg-red-500 mx-4 p-2 rounded-xl " onClick={()=>{reviewRequest("rejected",request._id)}}>Reject</button>   
+                <button className="btn bg-green-600 mx-4 p-2 rounded-xl" onClick={()=>{reviewRequest("accepted",request._id)}}>Accept</button>                 
             </div>
             </div>
         )})}

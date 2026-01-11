@@ -5,7 +5,6 @@ import { addFeed } from "../utils/feedSlice";
 import { useEffect } from "react";
 import UserCard from "./UserCard";
 import NoUsersLeft from "./NoUsersLeft";
-import SwipeCardStack from "./SwipeCardStack";
 
 
 const Feed = () => {
@@ -31,14 +30,13 @@ const Feed = () => {
       getFeed();
   },[]);
   if (!feed || feed.length === 0){
-      return <NoUsersLeft />
+      <NoUsersLeft />
     }
   
   
   return feed && (
     
-    <div className="flex justify-center mb-10 mt-5"><SwipeCardStack feed={feed} />
-</div>
+    <div className="flex justify-center mb-10 mt-5"><UserCard user = {feed[0]} /></div>
   )
 }
 

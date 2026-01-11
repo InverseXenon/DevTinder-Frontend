@@ -24,6 +24,7 @@ const UserCard = ({ user, onIgnore, onInterested }) => {
 
         <p className="text-sm opacity-90">{about}</p>
 
+        {/* ✅ buttons are still here */}
         <div className="card-actions justify-center my-2 gap-4">
           <button className="btn bg-red-700 p-2" onClick={onIgnore}>
             Ignore

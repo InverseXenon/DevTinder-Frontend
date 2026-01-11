@@ -6,22 +6,18 @@ const SwipeCard = ({
   user,
   onSwipeLeft,
   onSwipeRight,
-  onSwipeCancel,
-  className = "",
   children,
-  stackIndex = 0, // 0 = top card
+  stackIndex = 0,
+  setSwipeRef, // ✅ NEW: gives parent access to swipe functions
 }) => {
-  const cardRef = useRef(null);
-
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
   const [animatingOut, setAnimatingOut] = useState(false);
 
-  const SWIPE_THRESHOLD = 120; // px
+  const SWIPE_THRESHOLD = 120;
   const ROTATION = useMemo(() => clamp(pos.x / 15, -15, 15), [pos.x]);
 
-  // stack effect for behind cards
   const stackStyle = useMemo(() => {
     if (stackIndex === 0) return {};
     const scale = 1 - stackIndex * 0.04;
@@ -32,10 +28,38 @@ const SwipeCard = ({
     };
   }, [stackIndex]);
 
+  const swipeOut = (dir) => {
+    if (stackIndex !== 0) return;
+
+    setAnimatingOut(true);
+
+    const x = dir === "right" ? 900 : -900;
+    const y = pos.y;
+
+    setPos({ x, y });
+
+    setTimeout(() => {
+      if (dir === "left") onSwipeLeft?.(user);
+      if (dir === "right") onSwipeRight?.(user);
+
+      setPos({ x: 0, y: 0 });
+      setAnimatingOut(false);
+    }, 220);
+  };
+
+  // ✅ expose swipe functions to parent
+  useEffect(() => {
+    if (stackIndex !== 0) return;
+    setSwipeRef?.({
+      swipeLeft: () => swipeOut("left"),
+      swipeRight: () => swipeOut("right"),
+    });
+  }, [stackIndex]);
+
   const handlePointerDown = (e) => {
-    if (stackIndex !== 0) return; // only top is draggable
+    if (stackIndex !== 0) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
     setIsDragging(true);
-    setAnimatingOut(false);
     setStart({ x: e.clientX, y: e.clientY });
   };
 
@@ -46,28 +70,7 @@ const SwipeCard = ({
     setPos({ x: dx, y: dy });
   };
 
-  const resetCard = () => {
-    setPos({ x: 0, y: 0 });
-    onSwipeCancel?.();
-  };
-
-  const swipeOut = (dir) => {
-    setAnimatingOut(true);
-
-    // fly off screen
-    const x = dir === "right" ? 900 : -900;
-    const y = pos.y;
-
-    setPos({ x, y });
-
-    // wait for animation end then trigger callback
-    setTimeout(() => {
-      if (dir === "left") onSwipeLeft?.(user);
-      if (dir === "right") onSwipeRight?.(user);
-      setPos({ x: 0, y: 0 }); // reset for next card render
-      setAnimatingOut(false);
-    }, 220);
-  };
+  const resetCard = () => setPos({ x: 0, y: 0 });
 
   const handlePointerUp = () => {
     if (!isDragging || stackIndex !== 0) return;
@@ -89,23 +92,16 @@ const SwipeCard = ({
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, pos, start]);
 
   const likeOpacity = clamp((pos.x - 30) / 120, 0, 1);
   const nopeOpacity = clamp((-pos.x - 30) / 120, 0, 1);
 
   return (
-    <div
-      style={stackStyle}
-      className={`absolute inset-0 ${stackIndex === 0 ? "z-20" : "z-10"} ${className}`}
-    >
+    <div style={stackStyle} className={`absolute inset-0 ${stackIndex === 0 ? "z-20" : "z-10"}`}>
       <div
-        ref={cardRef}
         onPointerDown={handlePointerDown}
-        className={`select-none touch-none ${
-          stackIndex === 0 ? "cursor-grab active:cursor-grabbing" : ""
-        }`}
+        className={`select-none touch-none ${stackIndex === 0 ? "cursor-grab active:cursor-grabbing" : ""}`}
         style={{
           transform:
             stackIndex === 0
@@ -119,19 +115,12 @@ const SwipeCard = ({
               : "transform 200ms ease-out",
         }}
       >
-        {/* LIKE / NOPE stamps */}
         {stackIndex === 0 && (
           <>
-            <div
-              style={{ opacity: likeOpacity }}
-              className="absolute top-6 left-6 z-50 rotate-[-18deg] border-4 border-green-400 text-green-400 font-extrabold text-3xl px-4 py-2 rounded-xl"
-            >
+            <div style={{ opacity: likeOpacity }} className="absolute top-6 left-6 z-50 rotate-[-18deg] border-4 border-green-400 text-green-400 font-extrabold text-3xl px-4 py-2 rounded-xl">
               LIKE
             </div>
-            <div
-              style={{ opacity: nopeOpacity }}
-              className="absolute top-6 right-6 z-50 rotate-[18deg] border-4 border-red-400 text-red-400 font-extrabold text-3xl px-4 py-2 rounded-xl"
-            >
+            <div style={{ opacity: nopeOpacity }} className="absolute top-6 right-6 z-50 rotate-[18deg] border-4 border-red-400 text-red-400 font-extrabold text-3xl px-4 py-2 rounded-xl">
               NOPE
             </div>
           </>
